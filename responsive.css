@@ -1,0 +1,237 @@
+/* =============================================================================
+   responsive.css — 手机 / 平板 / 桌面 自适应层
+   -----------------------------------------------------------------------------
+   定位：只在 style.css、show.css 之后追加覆盖，不改动原文件。
+   手机（<720）完全沿用原设计，零回归；
+   断点：>=720 平板 / >=1024 桌面 / >=1440 大屏 / 矮屏与横屏单独修正。
+   所有数值都集中在这里，想调手感直接改这一段即可。
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   1. 指针设备修正（不改尺寸，只改交互反馈）
+   -------------------------------------------------------------------------- */
+
+/* 触屏没有"真实悬停"，去掉按完还粘住的位移和高亮 */
+@media (hover: none) {
+  button:not(:disabled):hover { filter: none; }
+  .level-card:hover { transform: none; box-shadow: 0 5px 0 var(--ink) !important; }
+  .activity-pill:hover { transform: none; box-shadow: 0 4px 0 var(--ink); }
+}
+
+/* 有鼠标时补一点更"桌面"的反馈 */
+@media (hover: hover) and (pointer: fine) {
+  .activity-pill:hover { transform: translateY(-3px); }
+  .level-card:hover strong { color: #7a3a5c; }
+  .choice:not(.picked):not(.rejected) { transition: filter .15s; }
+  .choice:not(.picked):not(.rejected):hover { filter: brightness(1.05); }
+  .sub-btn:hover, .big-btn:hover { filter: brightness(1.04); }
+}
+
+/* -----------------------------------------------------------------------------
+   2. 平板（>=720，含 iPad mini 竖屏 744）：单列加宽，字号轻微上调
+   -------------------------------------------------------------------------- */
+@media (min-width: 720px) {
+  #app { max-width: 600px; padding: 0 30px; }
+  .context { font-size: 17px; }
+  .word-cell { font-size: 42px; }
+  .choice { font-size: 37px; min-height: 82px; }
+  .intro { font-size: 15px; }
+  dialog { max-width: 480px; }
+  .guide-dialog { max-width: 500px; }
+  /* 大屏上背景留白斑块跟着放大，避免只在角落两小块 */
+  #paper {
+    background:
+      radial-gradient(circle at 14% 24%, #ffcee14d 0 22vmax, transparent 22.2vmax),
+      radial-gradient(circle at 90% 72%, #d9e4ff70 0 26vmax, transparent 26.2vmax),
+      linear-gradient(#7891bb13 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, #7891bb13 1px, transparent 1px) 0 0 / 28px 28px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   3. 桌面（>=1024）：首页改左右两栏，答题/结算页加宽放大
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  /* 3.1 容器：非首页保持"阅读宽度"，不要横跨整屏 */
+  #app { max-width: 560px; padding: 0 34px; }
+
+  /* 3.2 首页：左「海报舞台」＋ 右「操作面板」 */
+  body[data-screen="home"] #app { max-width: 1100px; --panel-w: 430px; }
+  body[data-screen="home"] #home {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--panel-w);
+    column-gap: 60px;
+    align-items: center;
+  }
+  body[data-screen="home"] .hero { margin: 0; }
+  body[data-screen="home"] .home-panel { min-width: 0; }
+
+  /* 3.3 首页整体在视口内垂直居中，不再顶到最上面留一屏空白 */
+  body[data-screen="home"] #app { justify-content: center; }
+  body[data-screen="home"] .screen { flex: 0 0 auto; }  body[data-screen="home"] footer {
+    margin-top: 0;
+    padding-top: 26px;
+    width: var(--panel-w);
+    margin-left: auto;
+  }
+
+  /* 3.3b 设置 / 帮助按钮回到文档流，避免飘在首屏主按钮上（窄屏桌面必现） */
+  body[data-screen="home"] .topbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 18px 0 0;
+    min-height: 0;
+  }
+  body[data-screen="home"] .top-actions {
+    position: static;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  /* 3.4 左栏海报放大 */
+  .logo { --fs: clamp(84px, 7.4vw, 116px); }
+  .intro { font-size: 15px; }
+  .home-stage { height: 200px; }
+  .home-stage .softie:nth-child(1), .home-stage .softie:nth-child(5) { width: 88px; }
+  .home-stage .softie:nth-child(2), .home-stage .softie:nth-child(4) { width: 106px; }
+  .home-stage .softie:nth-child(3) { width: 128px; }
+
+  /* 3.5 右栏控件放大到鼠标尺度 */
+  .big-btn.start-button { min-height: 78px; font-size: 25px; }
+  .big-btn.start-button small { font-size: 13px; }
+  .activity-pill { min-height: 74px; }
+  .activity-pill .activity-icon { width: 30px; height: 30px; }
+  .level-card { min-height: 84px; padding: 14px 20px; }
+  .level-card strong { font-size: 19px; }
+  .level-card small { font-size: 12px; }
+  .section-label h2 { font-size: 14px; }
+  .sub-btn { min-height: 56px; font-size: 16px; }
+
+  /* 3.6 答题页：轻微放大即可。放大过度会让四宫格字块撑满屏幕、必须滚动 */
+  .play-top h1 { font-size: 17px; }
+  .question-card { padding: 20px 24px 14px; border-radius: 24px; }
+  .card-heading { font-size: 12px; }
+  .context { font-size: 17px; line-height: 1.8; min-height: 58px; margin: 16px 0 18px; }
+  .word-slots { gap: 10px; }
+  .word-cell { font-size: 44px; border-radius: 15px; }
+  .choices { gap: 12px; }
+  .choice { min-height: 84px; font-size: 38px; border-radius: 17px; }
+  .choice small { font-size: 11px; top: 6px; left: 9px; }
+  .choice-note { font-size: 12px; }
+  .feedback { font-size: 13px; min-height: 32px; }
+  .play-stage { height: 110px; }
+  .play-stage .softie { width: 72px; }
+  .explain-heading b { font-size: 21px; }
+  #meaning { font-size: 15px; }
+  .example { font-size: 13px; }
+  .pips { margin: 10px 0 18px; }
+  .energy-track { margin: 9px 0 20px; }
+  .hint { font-size: 13px; }
+
+  /* 3.7 结算页放大 */
+  .result-screen h1 { font-size: 42px; }
+  .result-party { height: 132px; }
+  .result-party .softie { width: 86px; }
+  .result-score strong { font-size: 88px; }
+  #result-summary { font-size: 14px; }
+  .result-detail b { font-size: 28px; }
+
+  /* 3.8 对话框：桌面不要窄得像手机弹窗 */
+  dialog { max-width: 520px; padding: 28px; }
+  dialog h2 { font-size: 24px; }
+  .guide-dialog { max-width: 560px; }
+  .setting-row { padding: 22px 0; }
+
+  /* 3.9 两栏已经把横向空间吃满，原竖排装饰文案会压到内容上，隐藏 */
+  body:before, body:after { display: none; }
+}
+
+/* -----------------------------------------------------------------------------
+   4. 大屏（>=1440）：留白再放一档，别让内容显得小
+   -------------------------------------------------------------------------- */
+@media (min-width: 1440px) {
+  body[data-screen="home"] #app { max-width: 1200px; --panel-w: 470px; }
+  body[data-screen="home"] #home { grid-template-columns: minmax(0, 1fr) var(--panel-w); column-gap: 72px; }
+  .logo { --fs: clamp(96px, 7vw, 128px); }
+  .intro { font-size: 16px; }
+  .home-stage { height: 224px; }
+  .home-stage .softie:nth-child(1), .home-stage .softie:nth-child(5) { width: 96px; }
+  .home-stage .softie:nth-child(2), .home-stage .softie:nth-child(4) { width: 116px; }
+  .home-stage .softie:nth-child(3) { width: 140px; }
+  .level-card { min-height: 88px; }
+  .level-card strong { font-size: 20px; }
+  #app { max-width: 580px; }
+}
+
+/* -----------------------------------------------------------------------------
+   5. 矮屏桌面 / 笔记本（宽度够、高度不够）：压缩竖向量，尽量一屏看到入口
+   必须放在第 3、4 段之后才能覆盖上面的放大值
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) and (max-height: 840px) {
+  .logo { --fs: 76px; }
+  .intro { font-size: 13px; }
+  .home-stage { height: 146px; }
+  .home-stage .softie:nth-child(1), .home-stage .softie:nth-child(5) { width: 68px; }
+  .home-stage .softie:nth-child(2), .home-stage .softie:nth-child(4) { width: 84px; }
+  .home-stage .softie:nth-child(3) { width: 100px; }
+  .big-btn.start-button { min-height: 68px; font-size: 22px; }
+  .activity-bar { margin: 12px 0 12px; }
+  .activity-pill { min-height: 64px; }
+  .activity-pill .activity-icon { width: 24px; height: 24px; }
+  .section-label { margin: 16px 0 9px; }
+  .level-card { min-height: 72px; padding: 10px 18px; }
+  .level-card strong { font-size: 17px; }
+  .home-actions { margin-top: 12px; }
+  .sub-btn { min-height: 50px; }
+}
+
+/* -----------------------------------------------------------------------------
+   5b. 矮屏桌面的答题页：主角舞台是纯装饰，优先压缩它和字块高度，
+       保证「选项」不被挤到折叠线以下（1280×720、1366×768 这类笔记本很常见）
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) and (max-height: 860px) {
+  #app { max-width: 520px; }
+  .play-stage { height: 76px; }
+  .play-stage .softie { width: 56px; }
+  .question-card { padding: 16px 20px 12px; }
+  .context { font-size: 16px; margin: 12px 0 14px; min-height: 0; }
+  .word-cell { font-size: 38px; }
+  .choice { min-height: 72px; font-size: 34px; }
+  .feedback { min-height: 26px; margin-top: 10px; font-size: 12px; }
+  .pips { margin: 8px 0 12px; }
+  .energy-track { margin: 6px 0 12px; }
+  .hint-row { margin-top: 8px; }
+}
+
+@media (min-width: 1024px) and (max-height: 760px) {
+  #app { max-width: 470px; }
+  .play-stage { height: 60px; }
+  .play-stage .softie { width: 46px; }
+  #actor-caption { top: 0; }
+  .question-card { padding: 14px 18px 10px; }
+  .context { font-size: 15px; margin: 10px 0 12px; }
+  .word-cell { font-size: 32px; }
+  .choice { min-height: 64px; font-size: 29px; }
+  .choice small { top: 4px; left: 7px; }
+  .feedback { min-height: 22px; margin-top: 8px; }
+  .play-top { margin: 2px 0 2px; }
+  footer { padding: 8px 0; font-size: 9px; }
+}
+
+/* -----------------------------------------------------------------------------
+   5c. 极矮桌面：这时首页已经塞不进一屏，取消垂直居中，
+       否则 flex 居中会把顶部溢出到滚动区之外（够不到设置按钮）
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) and (max-height: 700px) {
+  body[data-screen="home"] #app { justify-content: flex-start; padding-top: 14px; }
+}
+
+/* -----------------------------------------------------------------------------
+   6. 超矮横屏（手机横放）：只保证不出纵向断层，不追求好看
+   -------------------------------------------------------------------------- */
+@media (max-height: 500px) and (orientation: landscape) {
+  #app { min-height: auto; padding-top: 12px; }
+  .home-stage { height: 96px; }
+  .logo { --fs: 58px; }
+  .play-stage { height: 84px; }
+}
